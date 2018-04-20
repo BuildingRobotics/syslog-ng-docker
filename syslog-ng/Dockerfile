@@ -18,4 +18,4 @@ EXPOSE 514/udp
 EXPOSE 601/tcp
 EXPOSE 6514/tcp
 
-ENTRYPOINT ["/usr/sbin/syslog-ng", "-F"]
+ENTRYPOINT ["/usr/sbin/syslog-ng", "-F", "--no-caps"]
