@@ -1,0 +1,25 @@
+env:
+  global:
+    - SYSLOG_NG_VERSION=3.14
+    # DOCKER_USER
+    - secure: "e0EmzPrbHp/s2dAyohShfqzNdsiVxUOTuNUxBcdQjK4FLW+5X4upuVKwnsO11JSytSvBbcbd5k7wJdr4nu3AEUr+PRsPoN/eixpUVSx6pbNOtLhRCgfU7NBcwxpGDhETlVcCOLCOAsAQl2xNRDOSjpwr/YgNAbcnsGorJ/+Xnc15O94Kyy+/DcH0E1I8EyK+t+i4q7gWtgV7Xn3GWGrw6Rg36Um2uzsNsTQk6JxM/ocyWqbTsqnL4hAKo6A/hjkXBRdJ8hX5Bgk8+YUka5+KSFGQEmMqMoY0zBULJVtQb92Fgy/rq91sRL4uAXO/gAS6OdtW1WUx3K/HsxkXIRnL6Onkb/IVXtPaNjw0UxOf2MMRMjwUflGBoNEVilcBAlRBz6tHBQr210gtSwVWFkgYV5b1ANUCLwurWc2iJLu5IByVKcZ7WwEghjiVJwfrrNB+2T5W1xHjg1UbcTQOAcY3M3oVxa+PSvjOEUviplUSq3pSau+/7axQ1ntcfS+8C9fAKqmGRFEMFx6lQkaKIODVS654NLgnSbTscbTfiRtAwCA6b7greyN8PoNSW6yPT4ytFnOXM9jFwCoaGyYLriKhTk7EubHnjGWtj/h7L7hSwyva3qTs02vn0bT+8uh+DdOLeI5cH2NYiBc2wEav2qKYEq8Bon6LhNg3+q2lSzGpKUc="
+    # DOCKER_PASS
+    - secure: "qhDbfcqVYZ4XZ81+1wJCkxjIVUtetmS4ro9pH0vQyL2QlhlfHgmfGZAebesJBsJ/t19Y6lfVw82mBdsucGKTJo3jLDiSU/AnXmLAcZg3b0Td5slK5SvZwu82FQV5JchDAx1519/HT9oXFHRLvA3FiG7l8Ws4ssRvxbsKsR24i4uKbz1ovBHBEy1o+Xscyzg2Ih3a4WbEsv1YxzfHmVTtf06rhjfeKyXvDF3meBTxHs817WJkkVrztq+pxIAiyom0IBM4mDdTZ0clSvQRuMjvL4C268DhLJrrjbeVYtev04+z+eS8cDaetnXW4kPa7YQB+BZNMPTRRl94pNR5DwJg15m/2G95P3JlqcUghsXU/lP2GOpJ9mKx7+WSHKvPxBghgbPcFVYhySUdHxIaBpxoT4e1b8ao7y+xgA5rLHXImuQymLPHivpxoYsctIQjJq7A6x7PM9H2g/XWnZuQSuQtnQzycDlF7sNS3uEJTlwDqGbjUmtCZ5fEtGZqlbUdCizg0SU9VmaVzIrBU4ptYG0R0ay3vz7Rht8yyn4R7kF8P3fyoZXkDvREJ0tqflvbnYPvDUen008pFUY6uAbJPAA9UtHJMFcJ8TApBmjl4Hvs0Ye94wsSSZGoKwnvfqyA9rPdMF34wlIqaowEgqxMaKzn5NWDPiEjGwbhPFVprgbxh2E="
+    # Where to push Docker image
+    - DOCKER_REPO=comfy/syslog-ng
+services:
+  - docker
+before_script:
+  # Log in to docker hub
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  # Get tags for this build
+  - VERSION=$SYSLOG_NG_VERSION.$TRAVIS_BUILD_NUMBER
+  - DOCKER_TAGS=$(sh get-docker-tags.sh $DOCKER_REPO $VERSION)
+script:
+  # Build and tag the docker image
+  - docker build -t current $DOCKER_TAGS .
+after_success:
+  # Show built images
+  - docker images
+  # If we tagged this image, push it to Docker Hub
+  - test ! -z "$DOCKER_TAGS" && docker push $DOCKER_REPO
