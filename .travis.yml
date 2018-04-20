@@ -17,6 +17,7 @@ before_script:
   - DOCKER_TAGS=$(sh get-docker-tags.sh $DOCKER_REPO $VERSION)
 script:
   # Build and tag the docker image
+  - cd syslog-ng
   - docker build -t current $DOCKER_TAGS .
 after_success:
   # Show built images
